@@ -148,5 +148,5 @@ func postNewPost() {
 //getAllPosts()
 //postNewPost()
 
-// uncommon the below to allow this playground to work properly
+// uncommont the below to allow this playground to work properly
 //XCPlaygroundPage.currentPage.needsIndefiniteExecution = true
