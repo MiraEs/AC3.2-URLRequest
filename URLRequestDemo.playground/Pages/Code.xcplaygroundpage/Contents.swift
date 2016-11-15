@@ -2,17 +2,40 @@ import Foundation
 import PlaygroundSupport
 
 
-struct PlaceholderPost {
+protocol JSONable {
+    init?(json: [String: Any])
+    func toJson() -> [String:Any]
+}
+
+
+
+    //Added equatable protcol to compare these diff properties in this struct
+        //struct PlaceholderPost: Equaltable
+    // different types of PROTOCOLS available here
+struct PlaceholderPost: JSONable  {
     //1. what values needed to return for posts (Postman)
     //2. create the instance vars
     //3. parse out into 100 Placeholders (in func - create an array)
-    let userId: Int
-    let id: Int
-    let title: String
-    let body: String
+    let userId: Int = 0
+    let id: Int = 0
+    let title: String = ""
+    let body: String = ""
     
     
+    init?(json: [String : Any]) {
+        let juserId = userId as? Int
+        let jid = id as? Int
+        let jtitle = title as? String
+        let jbody = body as? String
+        
+    }
+    
+    func toJson() -> [String : Any] {
+        return [:]
+    }
 }
+
+/**   CAN YOU CREATE ONE FUNCTION TO DO ALL OF THESE??   **/
 
 //URL Session simple REST API calls
 func baselineURLSession() {
@@ -108,7 +131,7 @@ func getPlaceHolderRequest() {
                                 return
                         }
                         
-                        let placeholderArr = PlaceholderPost(userId: userId, id: id, title: title, body: body)
+                        let placeholderArr = PlaceholderPost(userId: userId, id: id, title: title, body: body) //??
                         postsArray.append(placeholderArr)
                     }
                 }
@@ -119,7 +142,7 @@ func getPlaceHolderRequest() {
         }.resume()
 }
 
-//Make POST?
+//Make POST? (creates and adds content)
 func postPlaceHolderRequest() {
     let freddyMercurysURL = URL(string: "https://jsonplaceholder.typicode.com/posts/")!
     var bohemianRequest = URLRequest(url: freddyMercurysURL)
@@ -170,6 +193,61 @@ func postPlaceHolderRequest() {
 }
 
 
+//PUT (updates content) and DELETE placeholders
+func putPlaceHolderRequest() {
+    let freddyMercurysURL = URL(string: "https://jsonplaceholder.typicode.com/posts/")!
+    var bohemianRequest = URLRequest(url: freddyMercurysURL)
+    bohemianRequest.httpMethod = "POST"
+    
+    //change this bicycleBody into data before making into a post?
+    let bohemianBicycleBody: [String:Any] = [
+        "userId": 5,
+        "title": "Ride My Bicycle",
+        "body": "I like to ride my bicycle, I like to ride my bike sometimes"
+    ]
+    
+    do {
+        let bohemianData = try JSONSerialization.data(withJSONObject: bohemianBicycleBody, options: [])
+        bohemianRequest.httpBody = bohemianData
+        
+        print(bohemianData)
+        
+    } catch {
+        print("Error creating the boehamian data: \(error)")
+        //this error is given to any do/catch - not the same error in parameters in URL request
+    }
+    
+    let session = URLSession(configuration: URLSessionConfiguration.default)
+    session.dataTask(with: bohemianRequest) {(data: Data?, _, bohemianError: Error?) in
+        
+        if bohemianError != nil {
+            print(bohemianError!)
+        }
+        
+        if data != nil {
+            print(data!)
+        }
+        
+        //another do catch? -> the response that you get back should post what you just created above
+        do {
+            let bohemianJson = try JSONSerialization.jsonObject(with: data!, options: []) as? [String:Any]
+            
+            if let validJson = bohemianJson {
+                print(validJson)
+            }
+            
+        }
+        catch {
+            print("bohemian json error: \(error)")
+        }
+        }.resume()
+
+}
+
+
+func deletePlaceHolderRequest() {}
+
+
 
 
 
@@ -183,7 +261,7 @@ func postPlaceHolderRequest() {
 //baselineURLSession()
 //newRequest()
 //getPlaceHolderRequest()
-postPlaceHolderRequest()
+//postPlaceHolderRequest()
 
 
 
