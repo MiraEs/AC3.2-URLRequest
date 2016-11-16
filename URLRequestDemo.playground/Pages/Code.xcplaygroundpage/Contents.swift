@@ -9,29 +9,43 @@ protocol JSONable {
 
 
 
-    //Added equatable protcol to compare these diff properties in this struct
-        //struct PlaceholderPost: Equaltable
-    // different types of PROTOCOLS available here
-struct PlaceholderPost: JSONable  {
+//Added equatable protcol to compare these diff properties in this struct
+//struct PlaceholderPost: Equaltable
+// different types of PROTOCOLS available here
+struct PlaceholderPost: JSONable {
     //1. what values needed to return for posts (Postman)
     //2. create the instance vars
     //3. parse out into 100 Placeholders (in func - create an array)
-    let userId: Int = 0
-    let id: Int = 0
-    let title: String = ""
-    let body: String = ""
+    let userId: Int
+    let id: Int
+    let title: String
+    let body: String
     
     
     init?(json: [String : Any]) {
-        let juserId = userId as? Int
-        let jid = id as? Int
-        let jtitle = title as? String
-        let jbody = body as? String
+        if let juserId = json["userId"] as? Int,
+            let id = json["id"] as? Int,
+            let title = json["title"] as? String,
+            let body = json["body"] as? String {
+            self.id = id
+            self.title = title
+            self.body = body
+        } else {
+            return nil
+        }
         
-    }
-    
-    func toJson() -> [String : Any] {
-        return [:]
+        
+        
+        //function to turn code back into Json Dict??
+        func toJson() -> [String : Any] {
+            let jsonLiteralDict: [String: Any] = [
+                "userId": self.userId,
+                "id": self.id,
+                "title": self.title,
+                "body": self.body
+            ]
+            PlaceholderPost(json: jsonLiteralDict)
+        }
     }
 }
 
@@ -112,30 +126,19 @@ func getPlaceHolderRequest() {
         
         
         if data != nil {
-        
+            
             do {
                 let json = try JSONSerialization.jsonObject(with: data!, options: []) as? [[String:Any]]
                 
                 if let validJson = json {
                     print("JSON HERE \(validJson)")
-                    
-                    var postsArray = [PlaceholderPost]()
                     for weirdJson in validJson {
-                        guard
-                            let userId = weirdJson["userId"] as? Int,
-                            let id = weirdJson["id"] as? Int,
-                            let title = weirdJson["title"] as? String,
-                            let body = weirdJson["body"] as? String
-                            else {
-                                print("error parsin postDict lawl")
-                                return
-                        }
-                        
-                        let placeholderArr = PlaceholderPost(userId: userId, id: id, title: title, body: body) //??
-                        postsArray.append(placeholderArr)
+                        PlaceholderPost(json: weirdJson)
                     }
+                    
                 }
-            } catch {
+            }
+            catch {
                 print("Error parsing: \(error)")
             }
         }
@@ -168,7 +171,7 @@ func postPlaceHolderRequest() {
     
     let session = URLSession(configuration: URLSessionConfiguration.default)
     session.dataTask(with: bohemianRequest) {(data: Data?, _, bohemianError: Error?) in
-    
+        
         if bohemianError != nil {
             print(bohemianError!)
         }
@@ -184,12 +187,12 @@ func postPlaceHolderRequest() {
             if let validJson = bohemianJson {
                 print(validJson)
             }
-        
+            
         }
         catch {
             print("bohemian json error: \(error)")
         }
-    }.resume()
+        }.resume()
 }
 
 
@@ -241,11 +244,11 @@ func putPlaceHolderRequest() {
             print("bohemian json error: \(error)")
         }
         }.resume()
-
+    
 }
 
 
-func deletePlaceHolderRequest() {}
+//func deletePlaceHolderRequest() {}
 
 
 
