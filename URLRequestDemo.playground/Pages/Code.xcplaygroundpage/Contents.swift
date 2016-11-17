@@ -380,6 +380,8 @@ func postComment() {
 }
 
 
+//Can make one function to do multiple URL requests depending on common parameters
+func makeCommentsRequests(commentId: Int = 1, endPoint: String, method: String = "GET", body: [String:Any]?, headers: [String:String]?) {}
 
 
 
